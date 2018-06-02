@@ -9,4 +9,5 @@ function User(){
     this.id='id';
     this.name='name';
     this.password='password';
+    this.admin = 'admin'
 }

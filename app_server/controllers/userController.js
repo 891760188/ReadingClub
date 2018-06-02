@@ -1,6 +1,61 @@
 ﻿
 var userDao = require('../dao/userDao');
 var user_DB = require('../model/User');//引入user实体
+var jwt    = require('jsonwebtoken'); // 使用jwt签名
+
+//------------------------------jwt
+module.exports.setup = function(req, res) {
+    if(req.query.name && req.query.password){
+        var  user= new user_DB();
+        user.name = req.query.name ;
+        user.password = req.query.password ;
+        userDao.InsertUser(user,function(qerr, result){
+            if (err) throw err;
+            console.log('用户存储成功');
+            res.json({ success: true ,result:result});
+        })}
+    else{
+        res.json({ success: false,msg:"错误参数" });
+    }
+}
+module.exports.authenticate = function(req, res) {
+    var  user= new user_DB();
+    user.name = req.query.name ;
+    user.password = req.query.password ;
+    userDao.findOne(user, function(err, userList, fields) {
+        if (err) throw err;
+        if (userList.length == 0) {
+            res.json({ success: false, message: '未找到授权用户' });
+        }else if (userList.length > 1) {
+            res.json({ success: false, message: '用户数据异常' });
+        }else  {
+            var user = userList[0];
+            if (user.password != req.query.password) {
+                res.json({ success: false, message: '用户密码错误' });
+            } else {
+               var aaa  = jwt.sign({
+                    name: 'name',password:'password'
+                }, 'secret', { expiresIn: 60 * 60 });
+                var token  = jwt.sign({
+                    data: 'foobar'
+                }, 'secret', { expiresIn: 60 * 60 });
+
+                res.json({
+                    success: true,
+                    message: '请使用您的授权码',
+                    token: token
+                });
+            }
+        }
+    });
+}
+//------------------------------jwt
+
+
+
+
+
+
 /**
  *  用户控制层
  * @param req 请求

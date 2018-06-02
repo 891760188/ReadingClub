@@ -1,9 +1,9 @@
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
-var logger = require('morgan');
+var logger = require('morgan');// 使用 morgan 将请求日志输出到控制台
 var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+var bodyParser = require('body-parser');//// 使用 body parser 将post参数及URL参数可以通过 req.body或req.query 拿到请求参数
 
 //直接获取到整个路由对象：
 var routes = require('./app_server/routes/index');//实际业务路由
@@ -13,6 +13,8 @@ var app = express();
 // view engine setup  用set方法设置了路由起始路径和视图引擎。
 app.set('views', path.join(__dirname, 'app_server', 'views'));//这里我们修改了路径在app_server文件夹下
 app.set('view engine', 'jade');//默认的视图引擎是jade
+// 设置superSecret 全局参数
+app.set('superSecret','myjwttest');
 
 //还可以设置路由是否忽略大小写,默认是不忽略。
 // app.set('case sensitive routing',true);
@@ -48,9 +50,12 @@ app.use('/', routes);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
     //打印错误日志
-    console.error(err.message);
-    console.error(err.stack);
-    console.error(JSON.stringify(err.stack));
+    if(err){
+        console.error(err.message);
+        console.error(err.stack);
+        console.error(JSON.stringify(err.stack));
+    }
+
     var err = new Error('Not Found');
     err.status = 404;
     next(err);

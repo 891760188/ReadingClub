@@ -22,7 +22,19 @@ var userController = require('../controllers/userController');
 /**
  * 路由调用home.js暴露出来的回掉函数
  */
-router.get('/', homeController.index);
+
+//-----------------------------------------------jwt
+router.get('/', function(req, res) {
+    res.send('JWT 授权访问的API路径 http://localhost:3000/api');
+});
+// 在steup 路径下简单用户数据写入操作，为了身份验证，当然也可以不使用数据库。
+router.get('/setup',userController.setup);
+// 用户授权路径，返回JWT 的 Token 验证用户名密码
+router.get('/authenticate',userController.authenticate);
+
+//-----------------------------------------------jwt
+
+// router.get('/', homeController.index);
 router.get('/about', homeController.about);
 router.get('/books', homeController.books);
 

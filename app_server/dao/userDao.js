@@ -45,6 +45,14 @@ exports.FindById=function(id,callback){
     data.push(id);
     DaoBase.executeQuery(sql,data,callback);
 };
+//根据id查询
+exports.findOne=function(params,callback){
+    var sql='select * from tb_test_user_ where name=? and  password=? ';
+    var data=[];
+    data.push(params.name);
+    data.push(params.password);
+    DaoBase.executeQuery(sql,data,callback);
+};
 //登陆验证
 exports.UserLogin=function(params,callback){
     var sql='select * from tb_test_user_ where name=? and password=?';
