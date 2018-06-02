@@ -22,11 +22,12 @@ app.set('view engine', 'jade');//默认的视图引擎是jade
  * 中间件利用了尾触发机制，每个中间件传递请求对象，
  * 响应对象和尾触发函数，通过队列形成一个处理流。
  * 最简单的中间件形式：
- *app.use(function (req, res, next) {
- * console.log('Time: %d', Date.now());
- * next();
 *})
  * */
+app.use(function (req, res, next) {
+    console.log('Time: %d', Date.now());
+    next();
+})
 // uncomment after placing your favicon in /public
 //app.use(favicon(__dirname + '/public/favicon.ico'));
 app.use(logger('dev'));////日志，在开发环境下用彩色输出响应状态，会显示请求方式，响应时间和大小。
@@ -38,8 +39,18 @@ app.use(express.static(path.join(__dirname, 'public')));//静态文件路径
 //我们看到在设置了路由之后，如果请求还没返回则认为页面没有找到，这个时候app抛出一个error。并继续往下传递
 app.use('/', routes);
 
+/**
+ * 我们看到在设置了路由之后，
+ * 如果请求还没返回则认为页面没有找到，
+ * 这个时候app抛出一个error。
+ * 并继续往下传递
+ */
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
+    //打印错误日志
+    console.error(err.message);
+    console.error(err.stack);
+    console.error(JSON.stringify(err.stack));
     var err = new Error('Not Found');
     err.status = 404;
     next(err);
@@ -51,6 +62,10 @@ app.use(function (req, res, next) {
 // will print stacktrace
 if (app.get('env') === 'development') {
     app.use(function (err, req, res, next) {
+        //打印错误日志
+        console.error(err.message);
+        console.error(err.stack);
+        console.error(JSON.stringify(err.stack));
         res.status(err.status || 500);
         res.render('error', {
             message: err.message,
@@ -62,6 +77,10 @@ if (app.get('env') === 'development') {
 // production error handler
 // no stacktraces leaked to user
 app.use(function (err, req, res, next) {
+    //打印错误日志
+    console.error(err.message);
+    console.error(err.stack);
+    console.error(JSON.stringify(err.stack));
     res.status(err.status || 500);
     res.render('error', {
         message: err.message,
