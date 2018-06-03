@@ -33,12 +33,12 @@ module.exports.authenticate = function(req, res) {
             if (user.password != req.query.password) {
                 res.json({ success: false, message: '用户密码错误' });
             } else {
-               var aaa  = jwt.sign({
+               var token  = jwt.sign({
                     name: 'name',password:'password'
                 }, 'secret', { expiresIn: 60 * 60 });
-                var token  = jwt.sign({
-                    data: 'foobar'
-                }, 'secret', { expiresIn: 60 * 60 });
+               //  var token  = jwt.sign({
+               //      data: 'foobar'
+               //  }, 'secret', { expiresIn: 60 * 60 * 24 });
 
                 res.json({
                     success: true,

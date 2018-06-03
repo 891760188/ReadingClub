@@ -4,6 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');// 使用 morgan 将请求日志输出到控制台
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');//// 使用 body parser 将post参数及URL参数可以通过 req.body或req.query 拿到请求参数
+var jwt    = require('jsonwebtoken'); // 使用jwt签名
 
 //直接获取到整个路由对象：
 var routes = require('./app_server/routes/index');//实际业务路由
@@ -38,6 +39,45 @@ app.use(bodyParser.urlencoded({ extended: false }));////解析form请求（含�
 app.use(cookieParser());//解析cookie
 app.use(require('stylus').middleware(path.join(__dirname, 'public')));////使用stylus做css预编译，并指定路径。
 app.use(express.static(path.join(__dirname, 'public')));//静态文件路径
+
+//-------------------------jwt
+app.use(function(req, res, next) {
+    //过滤不需要会话的url
+    var originalUrl = req.originalUrl ;
+    console.log('originalUrl='+originalUrl);
+    if(originalUrl){
+        var uri = req.originalUrl.substring(1,originalUrl.indexOf('?'));
+        if(uri == 'authenticate'){
+            next();
+            return ;
+        }
+    }
+    // 拿取token 数据 按照自己传递方式写
+    var token = req.body.token || req.query.token || req.headers['x-access-token'];
+    if (token) {
+        // 解码 token (验证 secret 和检查有效期（exp）)  app.get('superSecret')
+        jwt.verify(token,'secret', function(err, decoded) {
+            if (err) {
+                return res.json({ success: false, message: '无效的token.' });
+            } else {
+                // 如果验证通过，在req中写入解密结果
+                req.decoded = decoded;
+                //console.log(decoded)  ;
+                next(); //继续下一步路由
+            }
+        });
+    } else {
+        // 没有拿到token 返回错误
+        return res.status(403).send({
+            success: false,
+            message: '没有找到token.'
+        });
+    }
+});
+
+//-------------------------jwt
+
+
 //我们看到在设置了路由之后，如果请求还没返回则认为页面没有找到，这个时候app抛出一个error。并继续往下传递
 app.use('/', routes);
 
